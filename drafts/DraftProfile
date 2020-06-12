@@ -1,0 +1,53 @@
+require_once "Classes/StatesDao.php";
+
+$statesDao = new StatesDao();
+	
+$states = $statesDao->selectStates();	
+
+<div class="input-field">
+    <select name="state" id="state">
+        <option value="selectState" selected>Selecione o estado</option>
+        <?php
+            foreach($states as $state){ ?>
+                <option value="<?php echo $state["id"] ?>"> <?php echo $state["uf"] ?></option>
+            <?php }
+        ?>
+    </select>
+</div>	
+
+
+<div class="input-field">
+    <select name="city" id="city">
+        <option value="" selected>Selecione a cidade</option>
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+    </select>
+</div>	
+
+
+
+
+
+
+//statesDAO
+
+
+<?php 
+	require_once "Connection.php";
+
+	class StatesDao{
+        
+        public function selectStates(){
+			$sql = "SELECT id, uf FROM estado";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->execute();
+
+			if($stmt->rowCount() > 0){
+				$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
+			}
+		}
+    }
+?>
