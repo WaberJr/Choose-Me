@@ -12,7 +12,8 @@
     $city = clear($_POST["city"]);
     $phone = clear($_POST["phone"]);
     $hidePhone = isset($_POST["hidePhone"]) ? clear($_POST["hidePhone"]) : "0";
-    $idService = clear($_POST["id_service"]);
+    $id_service = clear($_POST["id_service"]);
+    $id_user = clear($_POST["id_user"]);    
     $error = false;
 
 
@@ -27,13 +28,14 @@
         $services->setCity($city);
         $services->setPhone($phone);
         $services->setHidePhone($hidePhone);
-        $services->setIdService($idService);
+        $services->setIdService($id_service);        
 
         $servicesDao = new ServicesDao();
         $servicesDao->udpateService($services);
 
         echo var_dump($services);
-        //header("Location: ../editService.php?id_service=". $idService);
+        $_SESSION["editServiceMessage"] = "Dados salvos com sucesso!";
+        header("Location: ../editService.php?id_service=". $id_service ."&id_user=". $id_user);
     }
 
     function clear($value){

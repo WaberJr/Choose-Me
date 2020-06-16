@@ -243,7 +243,7 @@
 													class="validate"
 													value="<?php echo $_SESSION["addressNotFound"] == false ? $userAddress["0"]["state"] : ""?>"
 													>
-												<label for="state">Estado</label>
+												<label for="state">UF</label>
 											</div>
 										</div>
 

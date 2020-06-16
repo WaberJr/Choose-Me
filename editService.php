@@ -1,12 +1,13 @@
 <?php 
 	session_start();
 	require_once "Classes/ServicesDao.php";
-	require_once "Classes/ServicesTypesDao.php";
+    require_once "Classes/ServicesTypesDao.php";
+    $accessNotAllowed= false;
 
 	//Verificar se existe login
 	if(!isset($_SESSION["logged"])){
 		header("Location: home.php");
-	}
+    }
 
 	$userInfos = $_SESSION["userInfos"];
 	$firstName = explode(" ", $userInfos["name"]);
@@ -16,11 +17,19 @@
 	//Buscando os dados do anúncio
 	$servicesDao = new ServicesDao();
 	$service = $servicesDao->selectService($id_service, $userInfos["id_user"]);
-	$service = $service["0"];
-
+    //Se tiver valor na busca ele atribui ao index 0
+    if($service){
+        $service = $service["0"];
+    }
+    
 	//Pegando os tipos de anúncios
 	$servicesTypesDao = new ServicesTypesDao();    
-    $servicesTypes = $servicesTypesDao->selectServicesTypes();    
+    $servicesTypes = $servicesTypesDao->selectServicesTypes();   
+    
+    //Verificando se quem está acessando o link é o usuário logado
+    if($_GET["id_user"] != $userInfos["id_user"]){
+        $accessNotAllowed= true;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -91,193 +100,216 @@
 		</ul>
 
 		<!-- Content --> 
-		<div>
-			<div class="row">
-			<div>
-            <div>
-                <h5 class="center-align ">Editar Anúncio</h5>
-            </div>  
-
-
-			<form id="newService" action="Action/editServiceAction.php" method="POST">	
-                <div class="container z-depth-1">                
-					<br>
-
-					<div class="center-align">
-						 <!-- Modal Trigger -->
-						<a class="btn-small red accent-4 waves-effect waves-light modal-trigger" href="#deleteServiceModal"><i class="material-icons">delete_outline</i></a>
-						<button type="submit" name="btnEditService" class="btn-small red accent-4 waves-effect waves-light">Salvar</button>
-					</div>
-                    
+        <?php 
+            if(!$accessNotAllowed){ ?>
+                <div>
                     <div class="row">
-                        <div class="input-field col s12">
-                            <input placeholder="" 
-                                id="title"  
-                                name="title" 
-                                type="text" 
-                                class="validate" 
-                                minLength="5"
-                                value="<?php echo $service["title"]; ?>" 
-                                required>
-                            <label for="title">Título*</label>
-                        </div>
+                        <div>
+                            <div>
+                                <h5 class="center-align ">Editar Anúncio</h5>
+                            </div>  
+
+
+                            <form id="newService" action="Action/editServiceAction.php" method="POST">	
+                                <div class="container z-depth-1">                
+                                    <br>
+
+                                    <div class="center-align">
+                                        <!-- Modal Trigger -->
+                                        <a class="btn-small red accent-4 waves-effect waves-light modal-trigger" href="#deleteServiceModal"><i class="material-icons">delete_outline</i></a>
+                                        <button type="submit" name="btnEditService" class="btn-small red accent-4 waves-effect waves-light">Salvar</button>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="input-field col s12">
+                                            <input placeholder="" 
+                                                id="title"  
+                                                name="title" 
+                                                type="text" 
+                                                class="validate" 
+                                                minLength="5"
+                                                value="<?php echo $service["title"]; ?>" 
+                                                required>
+                                            <label for="title">Título*</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="input-field col s12">
+                                            <textarea placeholder="" 
+                                                    id="description" 
+                                                    name="description" 
+                                                    class="materialize-textarea validate" 
+                                                    minLength="10"
+                                                    required><?php echo $service["description"]; ?></textarea>
+                                            <label for="description">Descrição*</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <p class="center-align">Tipo</p>
+                                            <div class="container">
+                                                <?php 
+                                                    foreach($servicesTypes as $type){ ?>
+                                                        <p>
+                                                            <label>
+                                                                <input  name="type" 
+                                                                        value="<?php echo $type["id_service_type"] ?>" 
+                                                                        <?php echo $service["type"] == $type["id_service_type"] ? "checked" : ""?>
+                                                                        type="radio"/>
+                                                                <span><?php echo $type["description"] ?></span>
+                                                            </label>
+                                                        </p>
+                                                    <?php }  
+                                                ?>                                                                         
+                                            </div> 
+                                        </div>
+                                                        
+                                    </div>
+
+                                    <p class="center-align">Preencha o CEP</p>
+                                    
+                                    <div class="row">
+                                        <div class="input-field col s6 push-s3">
+                                            <input  placeholder="" 
+                                                    name="cep" 
+                                                    id="cep"
+                                                    type="text" 
+                                                    class="validate" 
+                                                    minLength="9"
+                                                    required
+                                                    value="<?php echo $service["cep"]; ?>"
+                                                >
+                                            <label for="cep">CEP*</label>
+                                        </div>
+                                    </div>
+
+                                    <!--Disabled-->
+                                    <div class="row">
+                                        <div class="input-field col s6 push-s3">
+                                            <input  placeholder="" 
+                                                    id="neighborhoodDisabled" 
+                                                    type="text" 
+                                                    disabled   
+                                                    value="<?php echo $service["neighborhood"]; ?>"                                                                     
+                                                >
+                                            <label for="neighborhood">Bairro</label>
+                                        </div>
+                                    </div>	
+
+                                    <div class="row">
+                                        <div class="col s3 push-s3">
+                                            <div class="input-field">
+                                                <input  placeholder="" 
+                                                        id="stateDisabled" 
+                                                        type="text" 
+                                                        disabled
+                                                        value="<?php echo $service["state"]; ?> "                                        
+                                                    >
+                                                <label for="state">UF</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col s3 push-s3">										
+                                            <div class="input-field">
+                                                <input  placeholder="" 
+                                                        id="cityDisabled" 
+                                                        type="text" 
+                                                        disabled
+                                                        value="<?php echo $service["city"]; ?>"
+                                                    >
+                                                <label for="city">Cidade</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Hidden-->
+                                    <div class="row">
+                                        <input  placeholder="" 
+                                                id="neighborhood"
+                                                name="neighborhood" 
+                                                type="hidden" 
+                                                class="validate"                                
+                                                value="<?php echo $service["neighborhood"]; ?>"
+                                            >
+                                    </div>	
+
+                                    <div class="row">
+                                        <input  placeholder="" 
+                                                id="state"
+                                                name="state" 
+                                                type="hidden" 
+                                                class="validate"                                    
+                                                value=" <?php echo $service["state"]; ?> "
+                                            >
+                                    </div>
+
+                                    <div class="row">										
+                                        <input  placeholder="" 
+                                                id="city"
+                                                name="city" 
+                                                type="hidden" 
+                                                class="validate"                                    
+                                                value="<?php echo $service["city"]; ?>"
+                                            >
+                                    </div>
+
+                                    <p class="center-align">Contato</p>
+
+                                    <div class="row">		      																
+                                        <!--Phone-->
+                                        <div class="input-field col s6 push-s3">
+                                            <input  placeholder="" 
+                                                    name="phone" 
+                                                    id="phone" 
+                                                    type="text" 
+                                                    maxLength="15"
+                                                    required
+                                                    value="<?php echo $service["phone"]; ?>" 
+                                                >
+                                            <label for="phone">Telefone</label>
+                                        </div>
+                                        <div class="center-align col s12">
+                                            <p>
+                                                <label>
+                                                    <input  type="checkbox" 
+                                                            name="hidePhone" 
+                                                            value="1" 
+                                                            <?php echo $service["hidePhone"] == "1" ? "checked" : ""?> 
+                                                            />
+                                                    <span>Ocultar meu telefone neste anúncio</span>
+                                                </label>
+                                            </p>
+                                        </div>
+                                    </div>                               
+                                </div>  
+                                <input type="hidden" name="id_service" value=" <?php echo $service["id_service"]; ?>">  
+                                <input type="hidden" name="id_user" value=" <?php echo $userInfos["id_user"]; ?>">               
+                            </form>        
+                        </div>	
+                    </div>
+                </div>
+            <?php } 
+            else{ ?>
+                <!-- Content -->
+                <div class="row container center-align vertical">
+                    <div class="col s12 light">
+                        <h5>Acesso negado!</h5>
+                        <h5>Você está tentando acessa um conteúdo onde não tem permissão. Por favor, volte para o início.</h5>
                     </div>
 
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <textarea placeholder="" 
-                                    id="description" 
-                                    name="description" 
-                                    class="materialize-textarea validate" 
-                                    minLength="10"
-                                    required><?php echo $service["title"]; ?></textarea>
-                            <label for="description">Descrição*</label>
-                        </div>
+                    <div class="col s12">
+                        <i class="material-icons large">report_problem</i>
                     </div>
 
-                    <div class="row">
-                        <div class="col s12">
-                            <p class="center-align">Tipo</p>
-                            <div class="container">
-                                <?php 
-                                    foreach($servicesTypes as $type){ ?>
-                                        <p>
-                                            <label>
-												<input  name="type" 
-														value="<?php echo $type["id_service_type"] ?>" 
-														<?php echo $service["type"] == $type["id_service_type"] ? "checked" : ""?>
-														type="radio"/>
-                                                <span><?php echo $type["description"] ?></span>
-                                            </label>
-                                        </p>
-                                    <?php }  
-                                ?>                                                                         
-                            </div> 
-                        </div>
-                                        
+                    <div class="col s12">
+                        <button class="btn red accent-4 waves-effect waves-light "><a href="index.php" class="white-text">Voltar para o início</a></button>
                     </div>
-
-                    <p class="center-align">Preencha o CEP</p>
-                    
-                    <div class="row">
-                        <div class="input-field col s6 push-s3">
-                            <input  placeholder="" 
-                                    name="cep" 
-                                    id="cep"
-                                    type="text" 
-                                    class="validate" 
-                                    minLength="9"
-                                    required
-                                    value=" <?php echo $service["cep"]; ?>"
-                                >
-                            <label for="cep">CEP*</label>
-                        </div>
-                    </div>
-
-                    <!--Disabled-->
-                    <div class="row">
-                        <div class="input-field col s6 push-s3">
-                            <input  placeholder="" 
-                                    id="neighborhoodDisabled" 
-                                    type="text" 
-                                    disabled   
-                                    value=" <?php echo $service["neighborhood"]; ?>"                                                                     
-                                >
-                            <label for="neighborhood">Bairro</label>
-                        </div>
-                    </div>	
-
-                    <div class="row">
-                        <div class="col s3 push-s3">
-                            <div class="input-field">
-                                <input  placeholder="" 
-                                        id="stateDisabled" 
-                                        type="text" 
-                                        disabled
-                                        value=" <?php echo $service["state"]; ?> "                                        
-                                    >
-                                <label for="state">Estado</label>
-                            </div>
-                        </div>
-
-                        <div class="col s3 push-s3">										
-                            <div class="input-field">
-                                <input  placeholder="" 
-                                        id="cityDisabled" 
-                                        type="text" 
-                                        disabled
-                                        value=" <?php echo $service["city"]; ?>"
-                                    >
-                                <label for="city">Cidade</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--Hidden-->
-                    <div class="row">
-                        <input  placeholder="" 
-                                id="neighborhood"
-                                name="neighborhood" 
-                                type="hidden" 
-                                class="validate"                                
-                                value=" <?php echo $service["neighborhood"]; ?>"
-                            >
-                    </div>	
-
-                    <div class="col s3 push-s3">
-                        <input  placeholder="" 
-                                id="state"
-                                name="state" 
-                                type="hidden" 
-                                class="validate"                                    
-                                value=" <?php echo $service["state"]; ?> "
-                            >
-                    </div>
-
-                    <div class="col s3 push-s3">										
-                        <input  placeholder="" 
-                                id="city"
-                                name="city" 
-                                type="hidden" 
-                                class="validate"                                    
-                                value=" <?php echo $service["city"]; ?>"
-                            >
-                    </div>
-
-                    <p class="center-align">Contato</p>
-
-                    <div class="row">		      																
-                        <!--Phone-->
-                        <div class="input-field col s6 push-s3">
-                            <input  placeholder="" 
-                                    name="phone" 
-                                    id="phone" 
-                                    type="text" 
-                                    maxLength="15"
-                                    required
-                                    value=" <?php echo $service["phone"]; ?>" 
-                                >
-                            <label for="phone">Telefone</label>
-                        </div>
-                        <div class="center-align col s12">
-                            <p >
-                                <label>
-                                    <input  type="checkbox" 
-                                            name="hidePhone" 
-                                            value="1" 
-                                            <?php echo $service["hidePhone"] == "1" ? "checked" : ""?> 
-                                            />
-                                    <span>Ocultar meu telefone neste anúncio</span>
-                                </label>
-                            </p>
-                        </div>
-                    </div>                               
-                </div>  
-                <input type="hidden" name="id_service" value=" <?php echo $service["id_service"]; ?>">              
-            </form>        
-        </div>	
-			</div>
-		</div>
+                </div>
+            <?php }
+        ?>
+		  
 
 		<!-- Footer -->
 		<footer class="page-footer red accent-4">
@@ -317,7 +349,78 @@
 
 				//Modal
 				$('.modal').modal();			
+            });
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            //Busca CEP	
+			$(document).ready(function() {
+				function limpa_formulário_cep() {
+					// Limpa valores do formulário de cep.
+					$("#street").val("");
+					$("#neighborhood").val("");
+					$("#city").val("");
+					$("#state").val("");
+				}
+
+				//Quando o campo cep perde o foco.
+				$("#cep").blur(function() {
+
+					//Nova variável "cep" somente com dígitos.
+					var cep = $(this).val().replace(/\D/g, '');
+
+					//Verifica se campo cep possui valor informado.
+					if (cep != "") {
+
+						//Expressão regular para validar o CEP.
+						var validacep = /^[0-9]{8}$/;
+
+						//Valida o formato do CEP.
+						if(validacep.test(cep)) {
+
+							//Preenche os campos com "..." enquanto consulta webservice.
+							$("#street").val("...");
+							$("#neighborhood").val("...");
+							$("#city").val("...");
+							$("#state").val("...");
+
+							//Consulta o webservice viacep.com.br/
+							$.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+
+								if (!("erro" in dados)) {
+									//Atualiza os campos com os valores da consulta.
+									$("#street").val(dados.logradouro);
+									$("#neighborhood").val(dados.bairro);
+									$("#city").val(dados.localidade);
+									$("#state").val(dados.uf);
+								} //end if.
+								else {
+									//CEP pesquisado não foi encontrado.
+									limpa_formulário_cep();
+									alert("CEP não encontrado.");						
+								}
+							});
+						} //end if.
+						else {
+							//cep é inválido.
+							limpa_formulário_cep();
+							alert("Formato de CEP inválido.");
+						}
+					} //end if.
+					else {
+						//cep sem valor, limpa formulário.
+						limpa_formulário_cep();
+					}
+				});
 			});
 		</script>
+        <?php
+			if(isset($_SESSION["editServiceMessage"])){ ?>
+				<script>
+					M.toast({html: '<?php echo $_SESSION["editServiceMessage"] ?>'})
+				</script>		
+			<?php }
+			unset($_SESSION["editServiceMessage"]);
+		?>
 	</body>
 </html>

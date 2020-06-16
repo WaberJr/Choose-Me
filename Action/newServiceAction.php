@@ -63,7 +63,7 @@
         $servicesDao = new ServicesDao();
         $servicesDao->insertService($services);
 
-        header("Location: ../index.php");
+        header("Location: ../servicePosted.php");
     }
 
     function clear($value){

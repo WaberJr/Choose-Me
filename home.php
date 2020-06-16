@@ -1,6 +1,21 @@
 <?php 
+	require_once "./Classes/UfDao.php";
+	require_once "./Classes/ServicesDao.php";
+	require_once "./Classes/ServicesTypesDao.php";
+
+
 	session_start();
 	session_unset();
+
+	//Pegando as UF's
+	$ufDao = new UfDao();
+	$ufs = $ufDao->selectUf();
+
+	//Pegando os últimos 10 anúncios
+	$servicesDao = new ServicesDao();
+	$top6Services = $servicesDao->selectTop6Services();	
+
+	$servicesTypesDao = new ServicesTypesDao();
 ?>
 
 <!DOCTYPE html>
@@ -19,12 +34,12 @@
 		<nav class="red accent-4">
 			<div class="nav-wrapper container">
 				<a href="home.php" class="brand-logo left"><i class="material-icons">work</i>ChooseMe</a>
-				<a href="#" data-target="mobile-demo" class="right sidenav-trigger"><i class="material-icons">menu</i></a>
+				<a href="#" data-target="mobile-demo" class="right sidenav-trigger"><i class="material-icons">menu</i></a>				
 				<ul class="right hide-on-med-and-down">
 					<!-- Dropdown Trigger -->
 					<li><a class="dropdown-trigger" data-target="dropdown1" data-beloworigin="true">Comece agora!<i class="material-icons right">arrow_drop_down</i></a></li>
 				</ul>
-			</div>
+			</div>			
 		</nav>
 		
 		<!--NavBar DropDown Content -->
@@ -42,6 +57,72 @@
 		</ul>
 
 		<!-- Content -->
+		<br>
+		<div class="nav-wrapper container z-depth-1">
+			<form action="Action/searchAction.php" name="searchForm" id="searchForm" method="POST">
+				<div class="input-field">
+					<input id="search"  type="search" placeholder="Busque por serviços, categorias, etc...">
+					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
+					<i class="material-icons">close</i>
+				</div>
+			</form>
+		</div>
+		<br>
+
+		<div class="row container">			
+			<div class="col s12">
+				<h5><i class="material-icons">location_on</i>Escolher meu estado:</h5>			
+			</div>
+	
+			<div class="col s12">
+				<?php 
+					foreach($ufs as $uf){ ?>
+						<a class="black-text" href="search.php?uf=<?php echo $uf["Uf"]; ?>"><?php echo $uf["Uf"]; ?> -</a>
+					<?php }
+				?>			
+			</div>
+		</div>
+		<br>
+
+		<div class="row container">			
+			<div class="col s12">
+				<h5><i class="material-icons">local_offer</i> Últimos anúncios:</h5>			
+			</div>
+	
+			<div class="col s12">
+				<div class="collection">
+				<?php 
+					foreach($top6Services as $service){ 
+						$date = new DateTime($service["createData"]);	
+						?>	
+						<a href="<?php echo "visualizeService.php?id_service=". $service["id_service"] . "&title=" . $service["title"]?>" class="collection-item black-text"> 
+							<!-- Título -->
+							<h5><?php echo $service["title"] ?></h5> 
+							<br>
+							<!-- Cidade/Estado -->
+							<?php
+							echo $service["city"] ." / ". $service["state"];
+							?>	
+							<br>
+							<!-- Descrição do tipo -->
+							<?php
+							$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
+							$typeDescription = $typeDescription[0]["description"];
+							echo $typeDescription;
+							?>
+													
+
+							<span class="badge">
+								<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+							</span>						
+						</a>
+					<?php }
+				?>
+				</div>
+			</div>
+		</div>
+		<br>						
+ 
 		<div>
 			<div class="parallax-container">
 				<div class="parallax">	 			
@@ -98,7 +179,7 @@
 				$('.sidenav').sidenav();
 
 				//Parallax
-				$('.parallax').parallax();
+				$('.parallax').parallax();				
 			});
 		</script>
 	</body>

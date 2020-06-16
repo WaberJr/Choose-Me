@@ -28,7 +28,7 @@
 
 			$mail->isHTML(true);
 			$mail->Subject = "E-mail de verificação Easy Office";
-			$mail->Body = "Para verificar a sua conta, por favor <a href='http://localhost/idea/emailVerification.php?vkey=$vKey'>clique aqui</a>";
+			$mail->Body = "Para verificar a sua conta, por favor <a href='http://localhost/chooseme/emailVerification.php?vkey=$vKey'>clique aqui</a>";
 			$mail->AltBody = "O seu provedor não aceita links HTML";
 
 			if($mail->send()){

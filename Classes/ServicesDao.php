@@ -23,7 +23,7 @@
 
 		//SELECTS
 		public function selectUserServices($id_user) {
-			$sql = "SELECT * FROM services WHERE id_user = ?";
+			$sql = "SELECT * FROM services WHERE id_user = ? ORDER BY createData DESC";
 
 			$stmt = Conexao::getConn()->prepare($sql);
 			$stmt->bindValue(1, $id_user);
@@ -55,20 +55,35 @@
 			}
 		}
 
-		//UPDATES
-		public function udpateService(Services $services){
-			$sql = "UPDATE services SET title = ?, description = ?, type ?, cep = ?, neighborhood = ?, state = ?, city = ?, phone = ?, hidePhone = ? WHERE id_service = ?";
+		public function selectTop6Services() {
+			$sql = "SELECT * FROM services ORDER BY createData DESC LIMIT 6";
 
 			$stmt = Conexao::getConn()->prepare($sql);
-			$stmt->bindValue(1, $services->getTitle());
+			$stmt->execute();
+
+			if($stmt->rowCount() > 0){
+				$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
+			}
+			else{
+				$_SESSION["serviceNotFound"] = true;
+			}
+		}
+
+		//UPDATES
+		public function udpateService(Services $services){
+			$sql = "UPDATE services SET title = ?, description = ?, type = ?, cep = ?, neighborhood = ?, state = ?, city = ?, phone = ?, hidePhone = ? WHERE id_service = ?";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->bindValue(1, $services->getTitle());	
 			$stmt->bindValue(2, $services->getDescription());
-			$stmt->bindValue(3, $services->getType());
+			$stmt->bindValue(3, $services->getType());					
 			$stmt->bindValue(4, $services->getCep());
 			$stmt->bindValue(5, $services->getNeighborhood());
 			$stmt->bindValue(6, $services->getState());
 			$stmt->bindValue(7, $services->getCity());
 			$stmt->bindValue(8, $services->getPhone());
-			$stmt->bindValue(9, $services->getHidePhone());
+			$stmt->bindValue(9, $services->getHidePhone());		
 			$stmt->bindValue(10, $services->getIdService());	
 			$stmt->execute();			
 		}

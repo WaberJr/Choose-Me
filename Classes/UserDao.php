@@ -54,6 +54,15 @@
 			$stmt->execute();
 		}
 
+		public function deleteUserAddress($id){
+			$sql = "DELETE FROM address WHERE id_user = ?";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->bindValue(1, $id);
+
+			$stmt->execute();
+		}
+
 		//SELECTS
 
 		//E-mail and Login validation

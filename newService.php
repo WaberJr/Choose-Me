@@ -216,7 +216,7 @@
                                             }
                                         ?>"                                        
                                     >
-                                <label for="state">Estado</label>
+                                <label for="state">UF</label>
                             </div>
                         </div>
 

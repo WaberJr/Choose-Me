@@ -8,5 +8,6 @@
     $servicesDao->deleteService($idService);
     
     echo var_dump($services);
+    $_SESSION["myServicesMessage"] = "Anúncio eliminado com sucesso!";
     header("Location: ../myServices.php");
 ?>

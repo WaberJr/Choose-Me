@@ -1,6 +1,10 @@
 <?php 
 	session_start();
 	require_once "Classes/ServicesDao.php";
+	require_once "./Classes/ServicesDao.php";
+	require_once "./Classes/ServicesTypesDao.php";
+
+	unset($_SESSION['servicesNotFound']);
 
 	//Verificar se existe login
 	if(!isset($_SESSION["logged"])){
@@ -11,9 +15,10 @@
 	$firstName = explode(" ", $userInfos["name"]);
 
 	//Selecionando todos os serviços do usuário
-	$servicesDao = new ServicesDao();
-	
+	$servicesDao = new ServicesDao();	
 	$services = $servicesDao->selectUserServices($userInfos["id_user"]);
+
+	$servicesTypesDao = new ServicesTypesDao();
 ?>
 
 <!DOCTYPE html>
@@ -95,30 +100,41 @@
 			//Verifica se existe anúncio
 			if(!isset($_SESSION["servicesNotFound"])){ ?>
 			<div class="collection">
-				<!-- Selecionado todos os serviços e montando a URL pra passar como parâmetro para editar -->
-									
-				<?php foreach($services as $service){ 
-					//Formatando a data						
-					$date = new DateTime($service["createData"]);											
-					?>
-					<a  href=<?php echo "editService.php?id_service=". $service["id_service"]?>
-						class="collection-item black-text"
-						>
-						<span class="badge">
-							<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
-						</span>
+				<?php 
+					foreach($services as $service){ 
+						$date = new DateTime($service["createData"]);	
+						?>	
+						<a href="<?php echo "editService.php?id_service=". $service["id_service"] . "&id_user=" . $service["id_user"]?>" class="collection-item black-text"> 
+							<!-- Título -->
+							<h5><?php echo $service["title"] ?></h5> 
+							<br>
+							<!-- Cidade/Estado -->
+							<?php
+							echo $service["city"] ." / ". $service["state"];
+							?>	
+							<br>
+							<!-- Descrição do tipo -->
+							<?php
+							$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
+							$typeDescription = $typeDescription[0]["description"];
+							echo $typeDescription;
+							?>
+													
 
-						<?php echo $service["title"]; ?>
-					</a>	
-				<?php }
-				} 
-				else{ ?>
-					<!-- Set não tiver ele simplesmente exibe a mensagem que não tem -->
-					<div class="center-align vertical">
-						<h4>Você ainda não possui anúncios ativos :(</h4>	
-					</div>									
-				<?php }
-			?>																		 
+							<span class="badge">
+								<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+							</span>						
+						</a>
+					<?php }
+					}
+					else{ ?> 
+						<!-- Set não tiver ele simplesmente exibe a mensagem que não tem -->
+						<div class="center-align vertical">
+							<h4>Você ainda não possui anúncios ativos :(</h4>	
+						</div>	
+					<?php }
+				?>
+																						 
 			</div>
 		</div>
 
@@ -147,5 +163,13 @@
 				$('.sidenav').sidenav();   			
 			});
 		</script>
+		<?php
+			if(isset($_SESSION["myServicesMessage"])){ ?>
+				<script>
+					M.toast({html: '<?php echo $_SESSION["myServicesMessage"] ?>'})
+				</script>		
+			<?php }
+			unset($_SESSION["myServicesMessage"]);
+		?>
 	</body>
 </html>

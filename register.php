@@ -63,7 +63,7 @@
 						<label for="confirmPassword">Confirmar senha</label>					
 					</div>
 
-					<button type="submit" id="btnRegister" name="btnRegister" class="btn waves-effect waves-light red accent-4">Cadastrar</button>				
+					<button type="submit" id="btnRegister" name="btnRegister" onKeyUp="disableButton()" class="btn waves-effect waves-light red accent-4">Cadastrar</button>				
 				</form>			
 			</div>
 
@@ -91,6 +91,15 @@
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>	
 		<script src="http://malsup.github.com/jquery.form.js"></script> 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> 
-		<script src="javascript/register.js"></script>
+		<script src="javascript/register.js">
+			var form = document.getElementById("registerForm");
+			var send = $("#btnRegister")
+			
+			$(form).submit(function(event) {
+				if(form.checkValidadity()){
+					send.attr("disabled", "disabled");
+				}
+			});
+		</script>
 	</body>
 </html>
