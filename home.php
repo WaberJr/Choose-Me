@@ -2,8 +2,7 @@
 	require_once "./Classes/UfDao.php";
 	require_once "./Classes/ServicesDao.php";
 	require_once "./Classes/ServicesTypesDao.php";
-
-
+	
 	session_start();
 	session_unset();
 
@@ -35,9 +34,18 @@
 			<div class="nav-wrapper container">
 				<a href="home.php" class="brand-logo left"><i class="material-icons">work</i>ChooseMe</a>
 				<a href="#" data-target="mobile-demo" class="right sidenav-trigger"><i class="material-icons">menu</i></a>				
-				<ul class="right hide-on-med-and-down">
+				<ul class="right">
+					<li>
+						<a href="login.php?publishNotLogged=1">
+							Anunciar serviço
+						</a>
+					</li>
 					<!-- Dropdown Trigger -->
-					<li><a class="dropdown-trigger" data-target="dropdown1" data-beloworigin="true">Comece agora!<i class="material-icons right">arrow_drop_down</i></a></li>
+					<li>
+						<a class="dropdown-trigger hide-on-med-and-down" data-target="dropdown1" data-beloworigin="true">Comece agora!
+							<i class="material-icons right">arrow_drop_down</i>
+						</a>
+					</li>
 				</ul>
 			</div>			
 		</nav>
@@ -59,9 +67,9 @@
 		<!-- Content -->
 		<br>
 		<div class="nav-wrapper container z-depth-1">
-			<form action="Action/searchAction.php" name="searchForm" id="searchForm" method="POST">
+			<form action="search.php?search=<?php echo  $_GET["search"] ?>" name="searchForm" id="searchForm" method="GET">
 				<div class="input-field">
-					<input id="search"  type="search" placeholder="Busque por serviços, categorias, etc...">
+					<input id="search" name="search" type="search" placeholder="Busque por serviços, categorias, etc...">
 					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 					<i class="material-icons">close</i>
 				</div>
@@ -77,7 +85,7 @@
 			<div class="col s12">
 				<?php 
 					foreach($ufs as $uf){ ?>
-						<a class="black-text" href="search.php?uf=<?php echo $uf["Uf"]; ?>"><?php echo $uf["Uf"]; ?> -</a>
+						<a class="black-text" href="search.php?uf=<?php echo $uf["Uf"]; ?>"><?php echo $uf["Uf"] != "TO" ? $uf["Uf"] ." -": "TO"?> </a>
 					<?php }
 				?>			
 			</div>
@@ -92,32 +100,46 @@
 			<div class="col s12">
 				<div class="collection">
 				<?php 
-					foreach($top6Services as $service){ 
-						$date = new DateTime($service["createData"]);	
-						?>	
-						<a href="<?php echo "visualizeService.php?id_service=". $service["id_service"] . "&title=" . $service["title"]?>" class="collection-item black-text"> 
-							<!-- Título -->
-							<h5><?php echo $service["title"] ?></h5> 
-							<br>
-							<!-- Cidade/Estado -->
-							<?php
-							echo $service["city"] ." / ". $service["state"];
+					if(!isset($_SESSION["serviceNotFound"])){
+						foreach($top6Services as $service){ 
+							$date = new DateTime($service["createData"]);	
 							?>	
-							<br>
-							<!-- Descrição do tipo -->
-							<?php
-							$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
-							$typeDescription = $typeDescription[0]["description"];
-							echo $typeDescription;
-							?>
-													
+							<a href="<?php echo "visualizeService.php?id_service=". $service["id_service"] . "&identifier=" . $service["identifier"] ."&notLogged=1"?>" class="collection-item black-text"> 
+								<!-- Título -->
+								<h5 class="truncate"><?php echo $service["title"] ?></h5> 
+								<br>
+								<!-- Cidade/Estado -->
+								<?php
+								echo $service["city"] ." / ". $service["state"];
+								?>	
+								<br>
+								<!-- Descrição do tipo -->
+								<?php
+								$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
+								$typeDescription = $typeDescription[0]["description"];
+								echo $typeDescription;
+								?>
+														
+								<!--Exibe apenas para telas maiores -->
+								<span class="badge hide-on-small-only">
+									<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+								</span>		
 
-							<span class="badge">
-								<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
-							</span>						
-						</a>
-					<?php }
-				?>
+								<!--Exibe apenas para telas menores -->
+								<span class="badge show-on-small hide-on-med-and-up">
+									<?php echo $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+								</span>						
+							</a>
+							<?php }
+						} 
+						else{ ?>
+							<div class="center-align">
+								<h5>Ainda não há nenhum anúncio feito!</h5>
+								<p> Não perca tempo e faça o seu primeiro anúncio.</p>	
+								<p><a href="login.php?publishNotLogged=1" class="btn red accent-4 waves-effect waves-light white-text">Crie um anúncio agora!</a></p>					
+							</div>
+						<?php }
+					?>
 				</div>
 			</div>
 		</div>

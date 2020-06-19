@@ -3,11 +3,12 @@
 	require_once "./Classes/UfDao.php";
 	require_once "./Classes/ServicesDao.php";
 	require_once "./Classes/ServicesTypesDao.php";
+	unset($_SESSION["serviceNotFound"]);
 
 	//Verificar se existe login
 	if(!isset($_SESSION["logged"])){
 		header("Location: home.php");
-	}
+	}	
 
 	$userInfos = $_SESSION["userInfos"];
 	$firstName = explode(" ", $userInfos["name"]);
@@ -67,7 +68,7 @@
 
 		<!--SideNav Content -->
 		<ul class="sidenav" id="mobile-demo">
-			<ul class="center-align"><h5>Easy Office</h5></ul>
+			<ul class="center-align"><h5>ChooseMe</h5></ul>
 			<hr>
 			<ul class="collapsible">
 				<li>
@@ -93,9 +94,9 @@
 		<!-- Content --> 
 		<br>
 		<div class="nav-wrapper container z-depth-1">
-			<form action="Action/searchAction.php" name="searchForm" id="searchForm" method="POST">
+			<form action="search.php?search=<?php echo  $_GET["search"] ?>" name="searchForm" id="searchForm" method="GET">
 				<div class="input-field">
-					<input id="search"  type="search" placeholder="Busque por serviços, categorias, etc...">
+					<input id="search" name="search" type="search" placeholder="Busque por serviços, categorias, etc...">
 					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 					<i class="material-icons">close</i>
 				</div>
@@ -111,7 +112,7 @@
 			<div class="col s12">
 				<?php 
 					foreach($ufs as $uf){ ?>
-						<a class="black-text" href="search.php?uf=<?php echo $uf["Uf"]; ?>"><?php echo $uf["Uf"]; ?> -</a>
+						<a class="black-text" href="search.php?uf=<?php echo $uf["Uf"]; ?>"> <?php echo $uf["Uf"] != "TO" ? $uf["Uf"] ." -": "TO"?> </a>
 					<?php }
 				?>			
 			</div>
@@ -126,32 +127,48 @@
 			<div class="col s12">
 				<div class="collection">
 				<?php 
-					foreach($top6Services as $service){ 
-						$date = new DateTime($service["createData"]);	
-						?>	
-						<a href="<?php echo "visualizeService.php?id_service=". $service["id_service"] . "&title=" . $service["title"]?>" class="collection-item black-text"> 
-							<!-- Título -->
-							<h5><?php echo $service["title"] ?></h5> 
-							<br>
-							<!-- Cidade/Estado -->
-							<?php
-							echo $service["city"] ." / ". $service["state"];
+					if(!isset($_SESSION["serviceNotFound"])){
+						foreach($top6Services as $service){ 
+							$date = new DateTime($service["createData"]);	
 							?>	
-							<br>
-							<!-- Descrição do tipo -->
-							<?php
-							$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
-							$typeDescription = $typeDescription[0]["description"];
-							echo $typeDescription;
-							?>
-													
+							<a href="<?php echo "visualizeService.php?id_service=". $service["id_service"] . "&identifier=" . $service["identifier"]?>" class="collection-item black-text"> 
+								<!-- Título -->
+								<h5 class="truncate"><?php echo $service["title"] ?></h5> 
+								<br>
+								<!-- Cidade/Estado -->
+								<?php
+								echo $service["city"] ." / ". $service["state"];
+								?>	
+								<br>
+								<!-- Descrição do tipo -->
+								<span class="truncate">
+								<?php
+								$typeDescription = $servicesTypesDao->selectServicesTypesById($service["type"]); 
+								$typeDescription = $typeDescription[0]["description"];
+								echo $typeDescription;
+								?>
+								<span>
+									
+								<!--Exibe apenas para telas maiores -->
+								<span class="badge hide-on-small-only">
+									<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+								</span>		
 
-							<span class="badge">
-								<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
-							</span>						
-						</a>
-					<?php }
-				?>
+								<!--Exibe apenas para telas menores -->
+								<span class="badge show-on-small hide-on-med-and-up">
+									<?php echo $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+								</span>					
+							</a>
+						<?php }
+						}
+						else{ ?>
+							<div class="center-align">
+								<h5>Ainda não há nenhum anúncio feito!</h5>
+								<p> Não perca tempo e faça o seu primeiro anúncio.</p>	
+								<p><a href="newService.php" class="btn red accent-4 waves-effect waves-light white-text">Crie um anúncio agora!</a></p>					
+							</div>
+						<?php }
+					?>
 				</div>
 			</div>
 		</div>

@@ -65,7 +65,7 @@
 
 		<!--SideNav Content -->
 		<ul class="sidenav" id="mobile-demo">
-			<ul class="center-align"><h5>Easy Office</h5></ul>
+			<ul class="center-align"><h5>ChooseMe</h5></ul>
 			<hr>
 			<ul class="collapsible">
 				<li>
@@ -106,7 +106,7 @@
 						?>	
 						<a href="<?php echo "editService.php?id_service=". $service["id_service"] . "&id_user=" . $service["id_user"]?>" class="collection-item black-text"> 
 							<!-- Título -->
-							<h5><?php echo $service["title"] ?></h5> 
+							<h5 class="truncate"><?php echo $service["title"] ?></h5> 
 							<br>
 							<!-- Cidade/Estado -->
 							<?php
@@ -121,8 +121,14 @@
 							?>
 													
 
-							<span class="badge">
+							<!--Exibe apenas para telas maiores -->
+							<span class="badge hide-on-small-only">
 								<?php echo "Criado em: ". $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
+							</span>		
+
+							<!--Exibe apenas para telas menores -->
+							<span class="badge show-on-small hide-on-med-and-up">
+								<?php echo $date->format('d/m/y') ." às ". $date->format('H:i'); ?>
 							</span>						
 						</a>
 					<?php }

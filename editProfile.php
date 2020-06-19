@@ -64,7 +64,7 @@
 
 		<!--SideNav Content -->
 		<ul class="sidenav" id="mobile-demo">
-			<ul class="center-align"><h5>Easy Office</h5></ul>
+			<ul class="center-align"><h5>ChooseMe</h5></ul>
 			<hr>
 			<ul class="collapsible">
 				<li>

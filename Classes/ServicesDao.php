@@ -4,7 +4,7 @@
 	class ServicesDao{
 		//INSERTS
 		public function insertService(Services $services){
-			$sql = "INSERT INTO services (title, description, type, cep, neighborhood, state, city, phone, hidePhone, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$sql = "INSERT INTO services (title, description, type, cep, neighborhood, state, city, phone, hidePhone, id_user, identifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 			$stmt = Conexao::getConn()->prepare($sql);
 			$stmt->bindValue(1, $services->getTitle());
@@ -16,7 +16,8 @@
 			$stmt->bindValue(7, $services->getCity());
 			$stmt->bindValue(8, $services->getPhone());
 			$stmt->bindValue(9, $services->getHidePhone());
-			$stmt->bindValue(10, $services->getIdUser());			
+			$stmt->bindValue(10, $services->getIdUser());
+			$stmt->bindValue(11, $services->getIdentifier());			
 
 			$stmt->execute();
 		}
@@ -55,6 +56,23 @@
 			}
 		}
 
+		public function selectByIdServiceAndIdentifier($id_service, $identifier) {
+			$sql = "SELECT * FROM services WHERE id_service = ? AND identifier = ?";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->bindValue(1, $id_service);			
+			$stmt->bindValue(2, $identifier);			
+			$stmt->execute();
+
+			if($stmt->rowCount() > 0){
+				$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
+			}
+			else{
+				$_SESSION["serviceNotFound"] = true;
+			}
+		}
+
 		public function selectTop6Services() {
 			$sql = "SELECT * FROM services ORDER BY createData DESC LIMIT 6";
 
@@ -67,6 +85,39 @@
 			}
 			else{
 				$_SESSION["serviceNotFound"] = true;
+			}
+		}
+
+		public function selectAllServicesWhere($search) {
+			$sql = "SELECT * FROM services WHERE title LIKE ? OR description LIKE ? ORDER BY createData DESC";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->bindValue(1, "%". $search ."%");	
+			$stmt->bindValue(2, "%". $search ."%");
+			$stmt->execute();
+
+			if($stmt->rowCount() > 0){
+				$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
+			}
+			else{
+				$_SESSION["serviceNotFound"] = "Nenhum anúncio foi encontrado com esse termo de pesquisa :(";
+			}
+		}
+
+		public function selectServiceByUf($uf) {
+			$sql = "SELECT * FROM services WHERE state = ? ORDER BY createData DESC";
+
+			$stmt = Conexao::getConn()->prepare($sql);
+			$stmt->bindValue(1, $uf);			
+			$stmt->execute();
+
+			if($stmt->rowCount() > 0){
+				$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $result;
+			}
+			else{
+				$_SESSION["serviceNotFound"] = "Ainda não há anúncios no estado de ". $uf .".";
 			}
 		}
 

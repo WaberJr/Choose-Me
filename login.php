@@ -1,5 +1,12 @@
 <?php
-	session_start()
+	session_start();
+
+	if(isset($_GET["publishNotLogged"])){
+		$action = "Action/LoginAction.php?publishNotLogged=1";
+	}
+	else{
+		$action = "Action/LoginAction.php";
+	}	
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +38,7 @@
 			<h4 class="light col s12">Login</h4>	
 
 			<div class="col s12">
-				<form action="Action/LoginAction.php" name="loginForm" id="loginForm" method="POST"> 
+				<form action="<?php echo $action ?>" name="loginForm" id="loginForm" method="POST"> 
 
 					<div class="input-field col s12">
 						<input 

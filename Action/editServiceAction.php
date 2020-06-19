@@ -4,7 +4,7 @@
     session_start();
 
     $title = clear($_POST["title"]);
-    $description = clear($_POST["description"]);
+    $description = htmlspecialchars($_POST["description"]);
     $type = clear($_POST["type"]);
 	$cep = clear($_POST["cep"]);
 	$neighborhood = clear($_POST["neighborhood"]);

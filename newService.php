@@ -62,7 +62,7 @@
 
         <!--SideNav Content -->
         <ul class="sidenav" id="mobile-demo">
-            <ul class="center-align"><h5>Easy Office</h5></ul>
+            <ul class="center-align"><h5>ChooseMe</h5></ul>
             <hr>
             <ul class="collapsible">
                 <li>
@@ -99,26 +99,32 @@
                     <div class="row">
                         <div class="input-field col s12">
                             <input placeholder="" 
+                                onkeyup="contTitle(this.value, 50)"
                                 id="title"  
                                 name="title" 
                                 type="text" 
                                 class="validate" 
                                 minLength="5"
+                                maxLength="50"
                                 value="<?php echo isset($_SESSION["errorNewService"]) ? $_SESSION["errorNewService"]["title"] : "" ?>" 
                                 required>
                             <label for="title">Título*</label>
+                            <span class="right grey-text" id="contTitle">50</span>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="input-field col s12">
                             <textarea placeholder="" 
+                                    onkeyup="contDescription(this.value, 3000)"
                                     id="description" 
                                     name="description" 
                                     class="materialize-textarea validate" 
                                     minLength="10"
+                                    maxLength="3000"
                                     required><?php echo isset($_SESSION["errorNewService"]) ? $_SESSION["errorNewService"]["description"] : "" ?></textarea>
                             <label for="description">Descrição*</label>
+                            <span class="right grey-text" id="contDescription">3000</span>
                         </div>
                     </div>
 
@@ -385,6 +391,33 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <script>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //Conta quantidade de caracteres restantes título
+            function contTitle(valor, quant) {
+                total = valor.length;
+                if(total <= quant) {
+                    resto = quant - total;
+                    document.getElementById('contTitle').innerHTML = resto;
+                } else {
+                    document.getElementById('texto').value = valor.substr(0,quant);
+                }
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            //Conta quantidade de caracteres restantes descrição
+            function contDescription(valor, quant) {
+                total = valor.length;
+                if(total <= quant) {
+                    resto = quant - total;
+                    document.getElementById('contDescription').innerHTML = resto;
+                } else {
+                    document.getElementById('texto').value = valor.substr(0,quant);
+                }
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             //Máscara de telefone
             function mascara(o,f){
                     v_obj=o

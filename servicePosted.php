@@ -32,7 +32,7 @@
 			</div>
 
 			<div class="col s12">
-				<button class="btn red accent-4 waves-effect waves-light "><a href="myServices.php" class="white-text">Consultar meus anúncios</a></button>
+				<a href="myServices.php" class="btn red accent-4 waves-effect waves-light white-text">Consultar meus anúncios</a>
 			</div>
 		</div>
 		
@@ -40,7 +40,7 @@
 		<footer class="page-footer red accent-4">
 			<div class="footer-copyright red accent-4">
 				<div class="container center-align">
-						Powered By Waber Jr.
+					Powered By Waber Jr.
 				</div>
 			</div> 
 		</footer>

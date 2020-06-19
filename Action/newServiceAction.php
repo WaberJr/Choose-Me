@@ -4,7 +4,7 @@
     session_start();
 
     $title = clear($_POST["title"]);
-    $description = clear($_POST["description"]);
+    $description = htmlspecialchars($_POST["description"]);
     $type = clear($_POST["type"]);
 	$cep = clear($_POST["cep"]);
 	$neighborhood = clear($_POST["neighborhood"]);
@@ -13,6 +13,7 @@
     $phone = clear($_POST["phone"]);
     $hidePhone = isset($_POST["hidePhone"]) ? clear($_POST["hidePhone"]) : "0";
     $idUser = $_SESSION["userInfos"]["id_user"];
+    $identifier = md5(time().$idUser);
     $error = false;
 
     if(strlen($phone) > 0 and strlen($phone) < 14){
@@ -59,6 +60,7 @@
         $services->setPhone($phone);
         $services->setHidePhone($hidePhone);
         $services->setIdUser($idUser);
+        $services->setIdentifier($identifier);
 
         $servicesDao = new ServicesDao();
         $servicesDao->insertService($services);

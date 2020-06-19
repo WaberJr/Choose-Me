@@ -11,7 +11,7 @@
 		private $phone;
         private $hidePhone;
         private $idUser;
-
+		private $identifier;
 		
 		public function getIdService(){
 			return $this->idService;
@@ -99,6 +99,14 @@
 
 		public function setIdUser($idUser){
 			$this->idUser = $idUser;
+		}
+
+		public function getIdentifier(){
+			return $this->identifier;
+		}
+
+		public function setIdentifier($identifier){
+			$this->identifier = $identifier;
 		}
 	}
 ?>

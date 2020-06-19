@@ -17,7 +17,7 @@
 		<!-- Header-->
 		<nav class="red accent-4">
 			<div class="nav-wrapper container">
-				<a href="home.php" class="center brand-logo">Easy Office</a>		    	  	
+				<a href="home.php" class="center brand-logo">ChooseMe</a>		    	  	
 			</div>
 		</nav>
 
